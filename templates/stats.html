@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Stats & Rankings</h1>
+        <a href="{% url 'profile_home' profile.id %}" class="btn btn-outline-secondary">Back to Home</a>
+    </div>
+    
+    <ul class="nav nav-tabs mb-4" id="statsTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-stats" type="button" role="tab" aria-controls="image-stats" aria-selected="true">Photo Cards</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="prompt-tab" data-bs-toggle="tab" data-bs-target="#prompt-stats" type="button" role="tab" aria-controls="prompt-stats" aria-selected="false">Prompt Cards</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="statsTabContent">
+      <!-- Photo Cards Table -->
+      <div class="tab-pane fade show active" id="image-stats" role="tabpanel" aria-labelledby="image-tab">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Image</th>
+                <th scope="col">ELO</th>
+                <th scope="col">Won</th>
+                <th scope="col">Lost</th>
+                <th scope="col">Total Duels</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for card in image_cards %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>
+                    {% if card.image %}
+                    <img src="{{ card.image.url }}" alt="Card Image" style="height: 60px; width: auto; object-fit: contain;">
+                    {% else %}
+                    <span class="text-muted">No Image</span>
+                    {% endif %}
+                </td>
+                <td>{{ card.elo_rating|stringformat:".0f" }}</td>
+                <td class="text-success">{{ card.won_count }}</td>
+                <td class="text-danger">{{ card.lost_count }}</td>
+                <td>{{ card.won_count|add:card.lost_count }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center">No photo cards found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Prompt Cards Table -->
+      <div class="tab-pane fade" id="prompt-stats" role="tabpanel" aria-labelledby="prompt-tab">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Prompt</th>
+                <th scope="col">Answer</th>
+                <th scope="col">ELO</th>
+                <th scope="col">Won</th>
+                <th scope="col">Lost</th>
+                <th scope="col">Total Duels</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for card in prompt_cards %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ card.prompt.text }}</td>
+                <td>
+                    {% if card.answer %}
+                        {{ card.answer }}
+                    {% elif card.image %}
+                        <img src="{{ card.image.url }}" alt="Answer Image" style="height: 60px; width: auto; object-fit: contain;">
+                    {% endif %}
+                </td>
+                <td>{{ card.elo_rating|stringformat:".0f" }}</td>
+                <td class="text-success">{{ card.won_count }}</td>
+                <td class="text-danger">{{ card.lost_count }}</td>
+                <td>{{ card.won_count|add:card.lost_count }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center">No prompt cards found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

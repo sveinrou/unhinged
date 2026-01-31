@@ -12,9 +12,15 @@
     
     <hr>
     <h3>Judging</h3>
-    <div class="d-grid gap-3 col-md-6 mx-auto">
+    <div class="d-grid gap-3 col-md-6 mx-auto mb-4">
         <a href="{% url 'rank_cards' profile.id 'image' %}" class="btn btn-outline-primary btn-lg">Rank Photo Cards</a>
         <a href="{% url 'rank_cards' profile.id 'prompt' %}" class="btn btn-outline-secondary btn-lg">Rank Prompt Cards</a>
+    </div>
+
+    <hr>
+    <h3>Results</h3>
+    <div class="d-grid gap-3 col-md-6 mx-auto">
+        <a href="{% url 'stats' profile.id %}" class="btn btn-info btn-lg text-white">View Stats & Rankings</a>
     </div>
   </div>
 </div>

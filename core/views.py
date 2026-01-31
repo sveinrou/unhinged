@@ -104,3 +104,23 @@ def rank_cards(request, profile_id, card_type):
         return render(request, 'rank.html', {'profile': profile, 'error': 'Not enough cards to rank!', 'card_type': card_type})
 
     return render(request, 'rank.html', {'profile': profile, 'card1': card1, 'card2': card2, 'card_type': card_type})
+
+def stats(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    if request.session.get('profile_id') != profile.id:
+        return redirect('index')
+
+    # distinct=True is used to avoid duplicate counting when joining multiple relations
+    cards = Card.objects.annotate(
+        won_count=Count('won_duels', distinct=True), 
+        lost_count=Count('lost_duels', distinct=True)
+    ).order_by('-elo_rating')
+
+    image_cards = cards.filter(prompt__isnull=True)
+    prompt_cards = cards.filter(prompt__isnull=False)
+
+    return render(request, 'stats.html', {
+        'profile': profile,
+        'image_cards': image_cards,
+        'prompt_cards': prompt_cards
+    })
