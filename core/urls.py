@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('profile/<int:profile_id>/join/', views.join_profile, name='join_profile'),
     path('profile/<int:profile_id>/', views.profile_home, name='profile_home'),
     path('profile/<int:profile_id>/upload/image/', views.upload_image_card, name='upload_image_card'),
     path('profile/<int:profile_id>/upload/prompt/', views.upload_prompt_card, name='upload_prompt_card'),

@@ -4,6 +4,9 @@
 <div class="row mt-4">
   <div class="col-12 text-center">
     <h1>{{ profile.name }}'s Profile</h1>
+    {% if participant %}
+    <p class="text-muted">Logged in as: <strong>{{ participant.name }}</strong></p>
+    {% endif %}
     <hr>
     <div class="d-grid gap-3 col-md-6 mx-auto mb-4">
         <a href="{% url 'upload_image_card' profile.id %}" class="btn btn-primary btn-lg">Upload Photo Card</a>

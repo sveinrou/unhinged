@@ -11,7 +11,7 @@ class Prompt(models.Model):
 
 class Profile(models.Model):
     name = models.CharField(max_length=100)
-    password = models.CharField(max_length=128, blank=True, help_text="Leave blank to auto-generate an 8-letter password.") # For simple entrance, not full authentication
+    password = models.CharField(max_length=128, blank=True, help_text="Leave blank to auto-generate an 8-letter password.") 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -22,13 +22,24 @@ class Profile(models.Model):
     def __str__(self):
         return self.name
 
+class Participant(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='participants')
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('profile', 'name')
+
+    def __str__(self):
+        return f"{self.name} ({self.profile.name})"
+
 class Card(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='cards', null=True)
+    uploader = models.ForeignKey(Participant, on_delete=models.SET_NULL, null=True, blank=True, related_name='cards')
     image = models.ImageField(upload_to='card_images/', blank=True, null=True)
     prompt = models.ForeignKey(Prompt, on_delete=models.SET_NULL, null=True, blank=True)
     answer = models.TextField(blank=True, null=True)
     elo_rating = models.FloatField(default=1200.0)
-    submitted_by = models.CharField(max_length=100, blank=True) # Name of person who made this card
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -38,6 +49,7 @@ class Card(models.Model):
 class Duel(models.Model):
     winner = models.ForeignKey(Card, on_delete=models.CASCADE, related_name='won_duels')
     loser = models.ForeignKey(Card, on_delete=models.CASCADE, related_name='lost_duels')
+    judge = models.ForeignKey(Participant, on_delete=models.SET_NULL, null=True, blank=True, related_name='judged_duels')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
