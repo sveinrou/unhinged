@@ -169,7 +169,15 @@ def final_results(request, profile_id):
 
     # Fetch all cards sorted by ELO
     images = list(Card.objects.filter(profile=profile, prompt__isnull=True).order_by('-elo_rating'))
-    prompts = list(Card.objects.filter(profile=profile, prompt__isnull=False).order_by('-elo_rating'))
+    all_prompts = Card.objects.filter(profile=profile, prompt__isnull=False).order_by('-elo_rating')
+    
+    # Filter prompts to keep only the highest rated one for each unique prompt
+    seen_prompts = set()
+    prompts = []
+    for card in all_prompts:
+        if card.prompt.id not in seen_prompts:
+            prompts.append(card)
+            seen_prompts.add(card.prompt.id)
 
     # Defined pattern: 1. photo, 2. prompt, 3. photo, 4. photo, 5. prompt, 6. photo, 7. prompt, 8. photo
     pattern = ['image', 'prompt', 'image', 'image', 'prompt', 'image', 'prompt', 'image']
