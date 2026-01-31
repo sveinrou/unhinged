@@ -161,3 +161,31 @@ def stats(request, profile_id):
         'image_cards': image_cards,
         'prompt_cards': prompt_cards
     })
+
+def final_results(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    if request.session.get('profile_id') != profile.id:
+        return redirect('index')
+
+    # Fetch all cards sorted by ELO
+    images = list(Card.objects.filter(profile=profile, prompt__isnull=True).order_by('-elo_rating'))
+    prompts = list(Card.objects.filter(profile=profile, prompt__isnull=False).order_by('-elo_rating'))
+
+    # Defined pattern: 1. photo, 2. prompt, 3. photo, 4. photo, 5. prompt, 6. photo, 7. prompt, 8. photo
+    pattern = ['image', 'prompt', 'image', 'image', 'prompt', 'image', 'prompt', 'image']
+    final_list = []
+
+    img_idx = 0
+    pmt_idx = 0
+
+    for item_type in pattern:
+        if item_type == 'image':
+            if img_idx < len(images):
+                final_list.append(images[img_idx])
+                img_idx += 1
+        elif item_type == 'prompt':
+            if pmt_idx < len(prompts):
+                final_list.append(prompts[pmt_idx])
+                pmt_idx += 1
+
+    return render(request, 'final_results.html', {'profile': profile, 'final_list': final_list})

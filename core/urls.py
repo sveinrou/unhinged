@@ -9,4 +9,5 @@ urlpatterns = [
     path('profile/<int:profile_id>/upload/prompt/', views.upload_prompt_card, name='upload_prompt_card'),
     path('profile/<int:profile_id>/rank/<str:card_type>/', views.rank_cards, name='rank_cards'),
     path('profile/<int:profile_id>/stats/', views.stats, name='stats'),
+    path('profile/<int:profile_id>/results/', views.final_results, name='final_results'),
 ]
