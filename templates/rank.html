@@ -21,47 +21,47 @@
     </div>
     {% endif %}
 
-    <div class="row align-items-center g-0 flex-grow-1 justify-content-center"> {# Added justify-content-center for horizontal centering #}
+    <div class="row g-0 flex-grow-1">
       <!-- Card 1 -->
-      <div class="col-12 col-md-6 my-2 d-flex align-items-center justify-content-center"> {# Added d-flex align-items-center justify-content-center to col-12 for centering card vert/horiz #}
-        <div class="card h-100 shadow-sm hover-shadow border-0">
+      <div class="col-12 col-md-6 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
+        <div class="card h-100 shadow-sm hover-hover border-0">
           {% if card1.image %}
           <img src="{{ card1.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 1 Image">
           {% endif %}
+          {% if card1.answer %} {# This applies to text-only prompt cards or image cards with captions (which we removed) #}
           <div class="card-body px-1 py-0">
-            {% if card1.answer %}
             <p class="card-text fs-6 mb-1">{{ card1.answer }}</p>
-            {% endif %}
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="winner" value="{{ card1.id }}">
-                <input type="hidden" name="loser" value="{{ card2.id }}">
-                <button type="submit" class="btn btn-success btn-sm w-100 mt-0">Stem</button>
-            </form>
           </div>
+          {% endif %}
         </div>
       </div>
 
       <!-- Card 2 -->
-      <div class="col-12 col-md-6 my-3 d-flex align-items-center justify-content-center"> {# Added d-flex align-items-center justify-content-center to col-12 #}
+      <div class="col-12 col-md-6 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
         <div class="card h-100 shadow-sm border-0">
            {% if card2.image %}
           <img src="{{ card2.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 2 Image">
           {% endif %}
+          {% if card2.answer %} {# This applies to text-only prompt cards or image cards with captions #}
           <div class="card-body px-1 py-0">
-            {% if card2.answer %}
             <p class="card-text fs-6 mb-1">{{ card2.answer }}</p>
-            {% endif %}
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="winner" value="{{ card2.id }}">
-                <input type="hidden" name="loser" value="{{ card1.id }}">
-                <button type="submit" class="btn btn-success btn-sm w-100 mt-0">Stem</button>
-            </form>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
+
+    <!-- Hidden forms for voting -->
+    <form id="voteForm1" method="post" action="{% url 'rank_cards' profile.id card_type %}" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="winner" value="{{ card1.id }}">
+        <input type="hidden" name="loser" value="{{ card2.id }}">
+    </form>
+    <form id="voteForm2" method="post" action="{% url 'rank_cards' profile.id card_type %}" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="winner" value="{{ card2.id }}">
+        <input type="hidden" name="loser" value="{{ card1.id }}">
+    </form>
     
     {% endif %}
   </div>
@@ -90,14 +90,17 @@
         object-fit: contain;
         width: 100%; /* Ensure it takes full width of its container */
     }
+    .clickable-card {
+        cursor: pointer;
+    }
+    .clickable-card:hover .shadow-sm {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; /* Re-apply hover shadow */
+    }
     @media (max-width: 767.98px) { /* Adjust for smaller screens */
         .ranking-image {
             max-height: 30vh; /* Reduced from 35vh to 30vh for very small screens */
         }
-        .col-6 { /* This rule was made redundant by col-12 change, but still present. Removing. */
-            padding-left: 5px;
-            padding-right: 5px;
-        }
     }
 </style>
 {% endblock %}
+
