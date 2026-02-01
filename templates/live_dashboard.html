@@ -37,7 +37,73 @@
     </div>
 </div>
 
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="card-title mb-0">Elo-utvikling (Topp 10)</h4>
+            </div>
+            <div class="card-body">
+                <canvas id="eloChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0/dist/chartjs-adapter-moment.min.js"></script>
+
 <script>
+    const ctx = document.getElementById('eloChart').getContext('2d');
+    let eloChart;
+
+    function initChart() {
+        eloChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute',
+                            displayFormats: {
+                                minute: 'HH:mm'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tid'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Elo Rating'
+                        },
+                        suggestedMin: 1000,
+                        suggestedMax: 1400
+                    }
+                }
+            }
+        });
+        updateChart();
+    }
+
+    function updateChart() {
+        fetch("{% url 'live_dashboard_chart_data' profile.id %}")
+            .then(response => response.json())
+            .then(data => {
+                eloChart.data.datasets = data.datasets;
+                eloChart.update('none');
+            })
+            .catch(error => console.error('Error fetching chart data:', error));
+    }
+
     function updateStats() {
         fetch("{% url 'live_dashboard_data' profile.id %}")
             .then(response => response.json())
@@ -49,7 +115,12 @@
             .catch(error => console.error('Error fetching dashboard data:', error));
     }
 
-    // Refresh every 5 seconds
+    // Refresh stats every 5 seconds, chart every 10 seconds
     setInterval(updateStats, 5000);
+    setInterval(updateChart, 10000);
+    
+    // Initial load
+    updateStats();
+    initChart();
 </script>
 {% endblock %}

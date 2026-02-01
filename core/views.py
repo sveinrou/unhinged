@@ -3,7 +3,7 @@ from .models import Profile, Card, Duel, Prompt, Participant
 from .forms import ImageCardForm, PromptCardForm
 import random
 from django.db.models import Count
-from .utils import calculate_elo
+from .utils import calculate_elo, calculate_elo_history
 from django.db.models import Q
 
 def index(request):
@@ -245,6 +245,58 @@ def live_dashboard_data(request, profile_id):
         'image_count': image_count,
         'prompt_count': prompt_count,
         'duel_count': duel_count
+    })
+
+@login_required
+def live_dashboard_chart_data(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    
+    # Fetch all data
+    cards = list(Card.objects.filter(profile=profile))
+    duels = list(Duel.objects.filter(winner__profile=profile).order_by('created_at'))
+    
+    history = calculate_elo_history(cards, duels)
+    
+    # Determine top 10 cards to display based on FINAL rating
+    final_ratings = calculate_elo(cards, duels)
+    for card in cards:
+        card.elo_rating = final_ratings[card.id]['rating']
+    cards.sort(key=lambda x: x.elo_rating, reverse=True)
+    top_cards = cards[:10] # Top 10
+    
+    datasets = []
+    colors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', 
+        '#FF9F40', '#E7E9ED', '#767676', '#52D726', '#FF0000'
+    ]
+    
+    for i, card in enumerate(top_cards):
+        # Label: Truncate long prompts/answers
+        label = str(card)
+        if len(label) > 20:
+            label = label[:20] + "..."
+            
+        data_points = history[card.id]
+        
+        # Ensure we have a starting point? 
+        # Actually calculate_elo_history only adds points on change.
+        # We can prepend the start.
+        if not data_points:
+             data_points = [{'x': profile.created_at.isoformat(), 'y': 1200.0}]
+        else:
+             # Prepend initial state at profile creation time for nice graph start
+             data_points.insert(0, {'x': profile.created_at.isoformat(), 'y': 1200.0})
+             
+        datasets.append({
+            'label': label,
+            'data': data_points,
+            'borderColor': colors[card.id % len(colors)],
+            'fill': False,
+            'tension': 0.1
+        })
+        
+    return JsonResponse({
+        'datasets': datasets
     })
 
 def final_results(request, profile_id):

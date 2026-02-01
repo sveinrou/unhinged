@@ -12,4 +12,5 @@ urlpatterns = [
     path('profile/<int:profile_id>/results/', views.final_results, name='final_results'),
     path('profile/<int:profile_id>/dashboard/', views.live_dashboard, name='live_dashboard'),
     path('profile/<int:profile_id>/dashboard/data/', views.live_dashboard_data, name='live_dashboard_data'),
+    path('profile/<int:profile_id>/dashboard/chart-data/', views.live_dashboard_chart_data, name='live_dashboard_chart_data'),
 ]
