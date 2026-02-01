@@ -5,14 +5,13 @@
   <div class="col-md-6">
     <div class="card mt-5">
       <div class="card-header">
-        <h3>Bli med i {{ profile.name }}</h3>
+        Registrer deg
       </div>
       <div class="card-body">
-        <p>Vennligst skriv inn et brukernavn for å identifisere dine bidrag og stemmer.</p>
         <form method="post">
           {% csrf_token %}
           <div class="mb-3">
-            <label for="name" class="form-label">Brukernavn</label>
+            <label for="name" class="form-label">Navn</label>
             <input type="text" class="form-control" id="name" name="name" required autofocus>
           </div>
           <div class="mb-3">
