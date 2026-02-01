@@ -10,4 +10,6 @@ urlpatterns = [
     path('profile/<int:profile_id>/rank/<str:card_type>/', views.rank_cards, name='rank_cards'),
     path('profile/<int:profile_id>/stats/', views.stats, name='stats'),
     path('profile/<int:profile_id>/results/', views.final_results, name='final_results'),
+    path('profile/<int:profile_id>/dashboard/', views.live_dashboard, name='live_dashboard'),
+    path('profile/<int:profile_id>/dashboard/data/', views.live_dashboard_data, name='live_dashboard_data'),
 ]

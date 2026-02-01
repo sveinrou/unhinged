@@ -32,3 +32,43 @@ def calculate_elo(cards, duels, initial_rating=1200.0, k_factor=32):
         ratings[loser_id]['rating'] += k_factor * (0 - expected_loser)
 
     return ratings
+
+def calculate_elo_history(cards, duels, initial_rating=1200.0, k_factor=32):
+    """
+    Calculates ELO history for a set of cards.
+    Returns a dictionary: {card_id: [{'x': timestamp, 'y': rating}, ...]}
+    """
+    # Initialize history with starting point (we don't have a start time, so maybe just first duel time or empty?)
+    # Let's just record changes. Chart.js can handle it.
+    
+    # Current ratings
+    ratings = {card.id: initial_rating for card in cards}
+    
+    # History: card_id -> list of points
+    history = {card.id: [] for card in cards}
+    
+    for duel in duels:
+        winner_id = duel.winner_id
+        loser_id = duel.loser_id
+
+        if winner_id not in ratings or loser_id not in ratings:
+            continue
+
+        w_curr = ratings[winner_id]
+        l_curr = ratings[loser_id]
+
+        expected_winner = 1 / (1 + 10 ** ((l_curr - w_curr) / 400))
+        expected_loser = 1 / (1 + 10 ** ((w_curr - l_curr) / 400))
+
+        # Calculate new ratings
+        w_new = w_curr + k_factor * (1 - expected_winner)
+        l_new = l_curr + k_factor * (0 - expected_loser)
+        
+        ratings[winner_id] = w_new
+        ratings[loser_id] = l_new
+        
+        # Append to history
+        history[winner_id].append({'x': duel.created_at.isoformat(), 'y': w_new})
+        history[loser_id].append({'x': duel.created_at.isoformat(), 'y': l_new})
+
+    return history

@@ -214,6 +214,39 @@ def stats(request, profile_id):
         'participants': participants
     })
 
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
+@login_required
+def live_dashboard(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    
+    # Initial data
+    image_count = Card.objects.filter(profile=profile, prompt__isnull=True).count()
+    prompt_count = Card.objects.filter(profile=profile, prompt__isnull=False).count()
+    duel_count = Duel.objects.filter(winner__profile=profile).count()
+
+    return render(request, 'live_dashboard.html', {
+        'profile': profile,
+        'image_count': image_count,
+        'prompt_count': prompt_count,
+        'duel_count': duel_count
+    })
+
+@login_required
+def live_dashboard_data(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    
+    image_count = Card.objects.filter(profile=profile, prompt__isnull=True).count()
+    prompt_count = Card.objects.filter(profile=profile, prompt__isnull=False).count()
+    duel_count = Duel.objects.filter(winner__profile=profile).count()
+    
+    return JsonResponse({
+        'image_count': image_count,
+        'prompt_count': prompt_count,
+        'duel_count': duel_count
+    })
+
 def final_results(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id)
     if request.session.get('profile_id') != profile.id:
