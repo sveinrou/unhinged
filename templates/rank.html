@@ -3,8 +3,8 @@
 {% block content %}
 <div class="row mt-4">
   <div class="col-12 text-center">
-    <h1>Rank {{ card_type|title }} Cards</h1>
-    <a href="{% url 'profile_home' profile.id %}" class="btn btn-outline-secondary mb-4">Back to Home</a>
+    <h1>Ranger {{ card_type }}kort</h1>
+    <a href="{% url 'profile_home' profile.id %}" class="btn btn-outline-secondary mb-4">Tilbake til hjem</a>
     
     {% if error %}
     <div class="alert alert-warning">
@@ -33,7 +33,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="winner" value="{{ card1.id }}">
                 <input type="hidden" name="loser" value="{{ card2.id }}">
-                <button type="submit" class="btn btn-success btn-lg w-100">Vote for Left</button>
+                <button type="submit" class="btn btn-success btn-lg w-100">Stem</button>
             </form>
           </div>
         </div>
@@ -41,7 +41,7 @@
 
       <!-- VS Badge -->
       <div class="col-md-2 text-center my-3">
-        <h2 class="fw-bold text-muted">VS</h2>
+        <h2 class="fw-bold text-muted">MOT</h2>
       </div>
 
       <!-- Card 2 -->
@@ -58,7 +58,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="winner" value="{{ card2.id }}">
                 <input type="hidden" name="loser" value="{{ card1.id }}">
-                <button type="submit" class="btn btn-success btn-lg w-100">Vote for Right</button>
+                <button type="submit" class="btn btn-success btn-lg w-100">Stem</button>
             </form>
           </div>
         </div>

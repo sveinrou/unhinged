@@ -3,33 +3,33 @@
 {% block content %}
 <div class="row mt-4">
   <div class="col-12 text-center">
-    <h1>{{ profile.name }}'s Profile</h1>
+    <h1>{{ profile.name }}s profil</h1>
     {% if participant %}
-    <p class="text-muted">Logged in as: <strong>{{ participant.name }}</strong></p>
+    <p class="text-muted">Logget inn som: <strong>{{ participant.name }}</strong></p>
     {% endif %}
     <hr>
     <div class="d-grid gap-3 col-md-6 mx-auto mb-4">
-        <a href="{% url 'upload_image_card' profile.id %}" class="btn btn-primary btn-lg">Upload Photo Card</a>
-        <a href="{% url 'upload_prompt_card' profile.id %}" class="btn btn-secondary btn-lg">Answer a Prompt</a>
+        <a href="{% url 'upload_image_card' profile.id %}" class="btn btn-primary btn-lg">Last opp bildekort</a>
+        <a href="{% url 'upload_prompt_card' profile.id %}" class="btn btn-secondary btn-lg">Svar på en prompt</a>
     </div>
     
     <hr>
-    <h3>Judging</h3>
+    <h3>Bedømming</h3>
     <div class="d-grid gap-3 col-md-6 mx-auto mb-4">
-        <a href="{% url 'rank_cards' profile.id 'image' %}" class="btn btn-outline-primary btn-lg">Rank Photo Cards</a>
-        <a href="{% url 'rank_cards' profile.id 'prompt' %}" class="btn btn-outline-secondary btn-lg">Rank Prompt Cards</a>
+        <a href="{% url 'rank_cards' profile.id 'image' %}" class="btn btn-outline-primary btn-lg">Ranger bildekort</a>
+        <a href="{% url 'rank_cards' profile.id 'prompt' %}" class="btn btn-outline-secondary btn-lg">Ranger promptkort</a>
     </div>
 
     <hr>
     {% if profile.results_available %}
-    <h3>Results</h3>
+    <h3>Resultater</h3>
     <div class="d-grid gap-3 col-md-6 mx-auto">
-        <a href="{% url 'stats' profile.id %}" class="btn btn-info btn-lg text-white">View Stats & Rankings</a>
-        <a href="{% url 'final_results' profile.id %}" class="btn btn-success btn-lg">Generate Final Profile</a>
+        <a href="{% url 'stats' profile.id %}" class="btn btn-info btn-lg text-white">Se statistikk og rangeringer</a>
+        <a href="{% url 'final_results' profile.id %}" class="btn btn-success btn-lg">Generer endelig profil</a>
     </div>
     {% else %}
     <div class="alert alert-secondary text-center">
-        Results are currently hidden. Keep voting!
+        Resultatene er foreløpig skjult. Fortsett å stemme!
     </div>
     {% endif %}
   </div>

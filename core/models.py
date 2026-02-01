@@ -25,9 +25,9 @@ class Profile(models.Model):
 
 class Participant(models.Model):
     GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('O', 'Other/Prefer not to say'),
+        ('M', 'Mann'),
+        ('F', 'Kvinne'),
+        ('O', 'Annet/foretrekker å ikke si'),
     ]
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='participants')
     name = models.CharField(max_length=100)

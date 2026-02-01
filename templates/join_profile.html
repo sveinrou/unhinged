@@ -5,25 +5,25 @@
   <div class="col-md-6">
     <div class="card mt-5">
       <div class="card-header">
-        <h3>Join {{ profile.name }}</h3>
+        <h3>Bli med i {{ profile.name }}</h3>
       </div>
       <div class="card-body">
-        <p>Please enter a username to identify your submissions and votes.</p>
+        <p>Vennligst skriv inn et brukernavn for å identifisere dine bidrag og stemmer.</p>
         <form method="post">
           {% csrf_token %}
           <div class="mb-3">
-            <label for="name" class="form-label">Username</label>
+            <label for="name" class="form-label">Brukernavn</label>
             <input type="text" class="form-control" id="name" name="name" required autofocus>
           </div>
           <div class="mb-3">
-            <label for="gender" class="form-label">Gender</label>
+            <label for="gender" class="form-label">Kjønn</label>
             <select class="form-select" id="gender" name="gender">
-                <option value="O" selected>Prefer not to say</option>
-                <option value="M">Male</option>
-                <option value="F">Female</option>
+                <option value="O" selected>Foretrekker å ikke si</option>
+                <option value="M">Mann</option>
+                <option value="F">Kvinne</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary">Join</button>
+          <button type="submit" class="btn btn-primary">Bli med</button>
         </form>
       </div>
     </div>

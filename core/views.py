@@ -16,7 +16,7 @@ def index(request):
             # Redirect to join page instead of home
             return redirect('join_profile', profile_id=profile.id)
         except Profile.DoesNotExist:
-            error = "Invalid password. Please try again."
+            error = "Ugyldig passord. Vennligst prøv igjen."
             
     return render(request, 'index.html', {'error': error})
 
@@ -78,7 +78,7 @@ def upload_image_card(request, profile_id):
     else:
         form = ImageCardForm()
     
-    return render(request, 'upload_card.html', {'form': form, 'profile': profile, 'title': 'Upload Photo Card'})
+    return render(request, 'upload_card.html', {'form': form, 'profile': profile, 'title': 'Last opp bildekort'})
 
 def upload_prompt_card(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id)
@@ -101,7 +101,7 @@ def upload_prompt_card(request, profile_id):
     else:
         form = PromptCardForm()
     
-    return render(request, 'upload_card.html', {'form': form, 'profile': profile, 'title': 'Answer a Prompt'})
+    return render(request, 'upload_card.html', {'form': form, 'profile': profile, 'title': 'Svar på en prompt'})
 
 def rank_cards(request, profile_id, card_type):
     profile = get_object_or_404(Profile, id=profile_id)
@@ -147,7 +147,7 @@ def rank_cards(request, profile_id, card_type):
                 card1, card2 = random.sample(list(cards), 2)
 
     if not card1 or not card2:
-        return render(request, 'rank.html', {'profile': profile, 'error': 'Not enough cards to rank!', 'card_type': card_type})
+        return render(request, 'rank.html', {'profile': profile, 'error': 'Ikke nok kort til å rangere!', 'card_type': card_type})
 
     return render(request, 'rank.html', {'profile': profile, 'card1': card1, 'card2': card2, 'card_type': card_type})
 
@@ -166,23 +166,23 @@ def stats(request, profile_id):
     
     # Apply filters
     filtered_duels = []
-    filter_label = "All Rankings"
+    filter_label = "Alle rangeringer"
 
     if filter_by == 'all':
         filtered_duels = all_duels
     elif filter_by == 'men':
         filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'M']
-        filter_label = "Men's Rankings"
+        filter_label = "Rangeringer (menn)"
     elif filter_by == 'women':
         filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'F']
-        filter_label = "Women's Rankings"
+        filter_label = "Rangeringer (kvinner)"
     else:
         # Check if it's a participant ID
         try:
              p_id = int(filter_by)
              participant = get_object_or_404(Participant, id=p_id)
              filtered_duels = [d for d in all_duels if d.judge and d.judge.id == p_id]
-             filter_label = f"{participant.name}'s Rankings"
+             filter_label = f"{participant.name}s rangeringer"
         except (ValueError, Participant.DoesNotExist):
              # Fallback
              filtered_duels = all_duels
@@ -227,23 +227,23 @@ def final_results(request, profile_id):
     
     # Apply filters
     filtered_duels = []
-    filter_label = "All Rankings"
+    filter_label = "Alle rangeringer"
 
     if filter_by == 'all':
         filtered_duels = all_duels
     elif filter_by == 'men':
         filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'M']
-        filter_label = "Men's Rankings"
+        filter_label = "Rangeringer (menn)"
     elif filter_by == 'women':
         filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'F']
-        filter_label = "Women's Rankings"
+        filter_label = "Rangeringer (kvinner)"
     else:
         # Check if it's a participant ID
         try:
              p_id = int(filter_by)
              participant = get_object_or_404(Participant, id=p_id)
              filtered_duels = [d for d in all_duels if d.judge and d.judge.id == p_id]
-             filter_label = f"{participant.name}'s Rankings"
+             filter_label = f"{participant.name}s rangeringer"
         except (ValueError, Participant.DoesNotExist):
              # Fallback
              filtered_duels = all_duels

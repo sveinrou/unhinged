@@ -4,8 +4,8 @@
 <div class="row mt-4">
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Stats & Rankings</h1>
-        <a href="{% url 'profile_home' profile.id %}" class="btn btn-outline-secondary">Back to Home</a>
+        <h1>Statistikk og rangeringer</h1>
+        <a href="{% url 'profile_home' profile.id %}" class="btn btn-outline-secondary">Tilbake til hjem</a>
     </div>
 
     <!-- Filter Form -->
@@ -13,14 +13,14 @@
         <div class="card-body">
             <form method="get" class="row align-items-center g-3">
                 <div class="col-auto">
-                    <label for="filter_by" class="col-form-label fw-bold">Filter By:</label>
+                    <label for="filter_by" class="col-form-label fw-bold">Filtrer etter:</label>
                 </div>
                 <div class="col-auto">
                     <select class="form-select" id="filter_by" name="filter_by" onchange="this.form.submit()">
-                        <option value="all" {% if filter_by == 'all' %}selected{% endif %}>All Votes</option>
-                        <option value="men" {% if filter_by == 'men' %}selected{% endif %}>Men Only</option>
-                        <option value="women" {% if filter_by == 'women' %}selected{% endif %}>Women Only</option>
-                        <optgroup label="Participants">
+                        <option value="all" {% if filter_by == 'all' %}selected{% endif %}>Alle stemmer</option>
+                        <option value="men" {% if filter_by == 'men' %}selected{% endif %}>Kun menn</option>
+                        <option value="women" {% if filter_by == 'women' %}selected{% endif %}>Kun kvinner</option>
+                        <optgroup label="Deltakere">
                             {% for p in participants %}
                                 <option value="{{ p.id }}" {% if filter_by == p.id|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
                             {% endfor %}
@@ -36,10 +36,10 @@
     
     <ul class="nav nav-tabs mb-4" id="statsTab" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-stats" type="button" role="tab" aria-controls="image-stats" aria-selected="true">Photo Cards</button>
+        <button class="nav-link active" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-stats" type="button" role="tab" aria-controls="image-stats" aria-selected="true">Bildekort</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="prompt-tab" data-bs-toggle="tab" data-bs-target="#prompt-stats" type="button" role="tab" aria-controls="prompt-stats" aria-selected="false">Prompt Cards</button>
+        <button class="nav-link" id="prompt-tab" data-bs-toggle="tab" data-bs-target="#prompt-stats" type="button" role="tab" aria-controls="prompt-stats" aria-selected="false">Promptkort</button>
       </li>
     </ul>
 
@@ -50,12 +50,12 @@
           <table class="table table-striped table-hover align-middle">
             <thead class="table-dark">
               <tr>
-                <th scope="col">Rank</th>
-                <th scope="col">Image</th>
-                <th scope="col">ELO</th>
-                <th scope="col">Won</th>
-                <th scope="col">Lost</th>
-                <th scope="col">Total Duels</th>
+                <th scope="col">Rang</th>
+                <th scope="col">Bilde</th>
+                <th scope="col">Elo</th>
+                <th scope="col">Vunnet</th>
+                <th scope="col">Tapt</th>
+                <th scope="col">Totale dueller</th>
               </tr>
             </thead>
             <tbody>
@@ -66,7 +66,7 @@
                     {% if card.image %}
                     <img src="{{ card.image.url }}" alt="Card Image" style="height: 60px; width: auto; object-fit: contain;">
                     {% else %}
-                    <span class="text-muted">No Image</span>
+                    <span class="text-muted">Ingen bilde</span>
                     {% endif %}
                 </td>
                 <td>{{ card.elo_rating|stringformat:".0f" }}</td>
@@ -76,7 +76,7 @@
               </tr>
               {% empty %}
               <tr>
-                <td colspan="6" class="text-center">No photo cards found.</td>
+                <td colspan="6" class="text-center">Ingen bildekort funnet.</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -90,13 +90,13 @@
           <table class="table table-striped table-hover align-middle">
             <thead class="table-dark">
               <tr>
-                <th scope="col">Rank</th>
+                <th scope="col">Rang</th>
                 <th scope="col">Prompt</th>
-                <th scope="col">Answer</th>
-                <th scope="col">ELO</th>
-                <th scope="col">Won</th>
-                <th scope="col">Lost</th>
-                <th scope="col">Total Duels</th>
+                <th scope="col">Svar</th>
+                <th scope="col">Elo</th>
+                <th scope="col">Vunnet</th>
+                <th scope="col">Tapt</th>
+                <th scope="col">Totale dueller</th>
               </tr>
             </thead>
             <tbody>
@@ -118,7 +118,7 @@
               </tr>
               {% empty %}
               <tr>
-                <td colspan="7" class="text-center">No prompt cards found.</td>
+                <td colspan="7" class="text-center">Ingen promptkort funnet.</td>
               </tr>
               {% endfor %}
             </tbody>

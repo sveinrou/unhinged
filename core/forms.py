@@ -6,7 +6,7 @@ class ImageCardForm(forms.ModelForm):
         model = Card
         fields = ['image']
         labels = {
-            'image': 'Upload Photo'
+            'image': 'Last opp bilde'
         }
     
     def __init__(self, *args, **kwargs):
@@ -14,14 +14,14 @@ class ImageCardForm(forms.ModelForm):
         self.fields['image'].required = True
 
 class PromptCardForm(forms.ModelForm):
-    prompt = forms.ModelChoiceField(queryset=Prompt.objects.all(), empty_label="Select a Prompt")
+    prompt = forms.ModelChoiceField(queryset=Prompt.objects.all(), empty_label="Velg en prompt")
 
     class Meta:
         model = Card
         fields = ['prompt', 'answer', 'image']
         labels = {
-            'answer': 'Text Answer',
-            'image': 'Image Answer'
+            'answer': 'Tekstsvar',
+            'image': 'Bildesvar'
         }
 
     def clean(self):
@@ -30,9 +30,9 @@ class PromptCardForm(forms.ModelForm):
         image = cleaned_data.get('image')
 
         if not answer and not image:
-            raise forms.ValidationError("You must provide either a text answer or an image.")
+            raise forms.ValidationError("Du må gi enten et tekstsvar eller et bilde.")
         
         if answer and image:
-             raise forms.ValidationError("Please provide either a text answer OR an image, not both.")
+             raise forms.ValidationError("Vennligst gi enten et tekstsvar ELLER et bilde, ikke begge.")
         
         return cleaned_data

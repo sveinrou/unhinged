@@ -3,8 +3,8 @@
 {% block content %}
 <div class="p-5 mb-4 bg-light rounded-3">
   <div class="container-fluid py-5">
-    <h1 class="display-5 fw-bold">Welcome to Unhinged</h1>
-    <p class="col-md-8 fs-4">The ultimate party game for roasting your friends. Enter your access code to begin.</p>
+    <h1 class="display-5 fw-bold">Velkommen til Unhinged</h1>
+    <p class="col-md-8 fs-4">Det ultimate partyspillet for å roaste vennene dine. Skriv inn tilgangskode for å begynne.</p>
   </div>
 </div>
 
@@ -20,11 +20,11 @@
         <form method="post">
           {% csrf_token %}
           <div class="mb-3">
-            <label for="password" class="form-label">Access Code</label>
-            <input type="text" class="form-control form-control-lg" id="password" name="password" placeholder="Enter code..." required autofocus>
+            <label for="password" class="form-label">Tilgangskode</label>
+            <input type="text" class="form-control form-control-lg" id="password" name="password" placeholder="Skriv kode..." required autofocus>
           </div>
           <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary btn-lg">Enter</button>
+            <button type="submit" class="btn btn-primary btn-lg">Gå inn</button>
           </div>
         </form>
       </div>
