@@ -24,8 +24,14 @@ class Profile(models.Model):
         return self.name
 
 class Participant(models.Model):
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other/Prefer not to say'),
+    ]
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='participants')
     name = models.CharField(max_length=100)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='O')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -40,7 +46,6 @@ class Card(models.Model):
     image = models.ImageField(upload_to='card_images/', blank=True, null=True)
     prompt = models.ForeignKey(Prompt, on_delete=models.SET_NULL, null=True, blank=True)
     answer = models.TextField(blank=True, null=True)
-    elo_rating = models.FloatField(default=1200.0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

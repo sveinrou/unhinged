@@ -9,6 +9,32 @@
       <a href="{% url 'profile_home' profile.id %}" class="btn btn-outline-secondary btn-sm mt-2">Back to Home</a>
     </div>
 
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row align-items-center g-3">
+                <div class="col-auto">
+                    <label for="filter_by" class="col-form-label fw-bold">Filter By:</label>
+                </div>
+                <div class="col-auto">
+                    <select class="form-select" id="filter_by" name="filter_by" onchange="this.form.submit()">
+                        <option value="all" {% if filter_by == 'all' %}selected{% endif %}>All Votes</option>
+                        <option value="men" {% if filter_by == 'men' %}selected{% endif %}>Men Only</option>
+                        <option value="women" {% if filter_by == 'women' %}selected{% endif %}>Women Only</option>
+                        <optgroup label="Participants">
+                            {% for p in participants %}
+                                <option value="{{ p.id }}" {% if filter_by == p.id|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col-auto ms-auto">
+                    <span class="badge bg-secondary fs-6">{{ filter_label }}</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="profile-feed">
       {% for card in final_list %}
         <div class="card mb-4 shadow-sm border-0 rounded-3 overflow-hidden">

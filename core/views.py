@@ -3,7 +3,8 @@ from .models import Profile, Card, Duel, Prompt, Participant
 from .forms import ImageCardForm, PromptCardForm
 import random
 from django.db.models import Count
-from .utils import update_elo
+from .utils import calculate_elo
+from django.db.models import Q
 
 def index(request):
     error = None
@@ -26,9 +27,17 @@ def join_profile(request, profile_id):
 
     if request.method == 'POST':
         name = request.POST.get('name')
+        gender = request.POST.get('gender')
         if name:
             # Get or create participant
-            participant, created = Participant.objects.get_or_create(profile=profile, name=name)
+            participant, created = Participant.objects.get_or_create(
+                profile=profile, 
+                name=name,
+                defaults={'gender': gender or 'O'}
+            )
+            # If participant existed but logic allows updating (not strictly requested but good for safety), 
+            # we keep existing data. Here we assume name is unique identifier per profile.
+            
             request.session['participant_id'] = participant.id
             return redirect('profile_home', profile_id=profile.id)
             
@@ -111,8 +120,8 @@ def rank_cards(request, profile_id, card_type):
         winner = get_object_or_404(Card, id=winner_id)
         loser = get_object_or_404(Card, id=loser_id)
         
+        # We just create the duel. ELO is calculated on the fly in stats view.
         Duel.objects.create(winner=winner, loser=loser, judge=participant)
-        update_elo(winner, loser)
         
         return redirect('rank_cards', profile_id=profile.id, card_type=card_type)
 
@@ -147,19 +156,62 @@ def stats(request, profile_id):
     if request.session.get('profile_id') != profile.id:
         return redirect('index')
 
-    # distinct=True is used to avoid duplicate counting when joining multiple relations
-    cards = Card.objects.annotate(
-        won_count=Count('won_duels', distinct=True), 
-        lost_count=Count('lost_duels', distinct=True)
-    ).order_by('-elo_rating')
+    filter_by = request.GET.get('filter_by', 'all')
+    
+    # Get all cards
+    cards = list(Card.objects.filter(profile=profile))
+    
+    # Get all duels relevant to this profile
+    all_duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge'))
+    
+    # Apply filters
+    filtered_duels = []
+    filter_label = "All Rankings"
 
-    image_cards = cards.filter(prompt__isnull=True)
-    prompt_cards = cards.filter(prompt__isnull=False)
+    if filter_by == 'all':
+        filtered_duels = all_duels
+    elif filter_by == 'men':
+        filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'M']
+        filter_label = "Men's Rankings"
+    elif filter_by == 'women':
+        filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'F']
+        filter_label = "Women's Rankings"
+    else:
+        # Check if it's a participant ID
+        try:
+             p_id = int(filter_by)
+             participant = get_object_or_404(Participant, id=p_id)
+             filtered_duels = [d for d in all_duels if d.judge and d.judge.id == p_id]
+             filter_label = f"{participant.name}'s Rankings"
+        except (ValueError, Participant.DoesNotExist):
+             # Fallback
+             filtered_duels = all_duels
+    
+    # Calculate ELOs based on filtered duels
+    ratings = calculate_elo(cards, filtered_duels)
+    
+    # Attach stats to card objects
+    for card in cards:
+        r = ratings.get(card.id)
+        card.elo_rating = r['rating']
+        card.won_count = r['won']
+        card.lost_count = r['lost']
+        
+    # Sort by ELO
+    cards.sort(key=lambda x: x.elo_rating, reverse=True)
+
+    image_cards = [c for c in cards if c.prompt is None]
+    prompt_cards = [c for c in cards if c.prompt is not None]
+    
+    participants = profile.participants.all().order_by('name')
 
     return render(request, 'stats.html', {
         'profile': profile,
         'image_cards': image_cards,
-        'prompt_cards': prompt_cards
+        'prompt_cards': prompt_cards,
+        'filter_by': filter_by,
+        'filter_label': filter_label,
+        'participants': participants
     })
 
 def final_results(request, profile_id):
@@ -167,11 +219,47 @@ def final_results(request, profile_id):
     if request.session.get('profile_id') != profile.id:
         return redirect('index')
 
+    filter_by = request.GET.get('filter_by', 'all')
+
     # Fetch all cards sorted by ELO
-    images = list(Card.objects.filter(profile=profile, prompt__isnull=True).order_by('-elo_rating'))
-    all_prompts = Card.objects.filter(profile=profile, prompt__isnull=False).order_by('-elo_rating')
+    cards = list(Card.objects.filter(profile=profile))
+    all_duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge'))
     
-    # Filter prompts to keep only the highest rated one for each unique prompt
+    # Apply filters
+    filtered_duels = []
+    filter_label = "All Rankings"
+
+    if filter_by == 'all':
+        filtered_duels = all_duels
+    elif filter_by == 'men':
+        filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'M']
+        filter_label = "Men's Rankings"
+    elif filter_by == 'women':
+        filtered_duels = [d for d in all_duels if d.judge and d.judge.gender == 'F']
+        filter_label = "Women's Rankings"
+    else:
+        # Check if it's a participant ID
+        try:
+             p_id = int(filter_by)
+             participant = get_object_or_404(Participant, id=p_id)
+             filtered_duels = [d for d in all_duels if d.judge and d.judge.id == p_id]
+             filter_label = f"{participant.name}'s Rankings"
+        except (ValueError, Participant.DoesNotExist):
+             # Fallback
+             filtered_duels = all_duels
+
+    ratings = calculate_elo(cards, filtered_duels)
+    
+    for card in cards:
+        card.elo_rating = ratings[card.id]['rating']
+        
+    cards.sort(key=lambda x: x.elo_rating, reverse=True)
+
+    # Separate
+    images = [c for c in cards if c.prompt is None]
+    all_prompts = [c for c in cards if c.prompt is not None]
+    
+    # Filter unique prompts (highest rated only)
     seen_prompts = set()
     prompts = []
     for card in all_prompts:
@@ -195,5 +283,13 @@ def final_results(request, profile_id):
             if pmt_idx < len(prompts):
                 final_list.append(prompts[pmt_idx])
                 pmt_idx += 1
+    
+    participants = profile.participants.all().order_by('name')
 
-    return render(request, 'final_results.html', {'profile': profile, 'final_list': final_list})
+    return render(request, 'final_results.html', {
+        'profile': profile, 
+        'final_list': final_list,
+        'participants': participants,
+        'filter_by': filter_by,
+        'filter_label': filter_label
+    })
