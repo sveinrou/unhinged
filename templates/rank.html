@@ -22,7 +22,12 @@
       <!-- Card 1 -->
       <div class="col-12 col-md-5 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
         <div class="card h-100 shadow-sm hover-hover p-3">
-          {% if card1.image %}
+          {% if card1.video %}
+          <video controls preload="metadata" class="card-img-top img-fluid ranking-image d-block mx-auto">
+              <source src="{{ card1.video.url }}" type="video/mp4">
+              Your browser does not support the video tag.
+          </video>
+          {% elif card1.image %}
           <img src="{{ card1.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 1 Image">
           {% endif %}
           {% if card1.prompt %}
@@ -47,7 +52,12 @@
       <!-- Card 2 -->
       <div class="col-12 col-md-5 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
         <div class="card h-100 shadow-sm border rounded p-3">
-           {% if card2.image %}
+           {% if card2.video %}
+          <video controls preload="metadata" class="card-img-top img-fluid ranking-image d-block mx-auto">
+              <source src="{{ card2.video.url }}" type="video/mp4">
+              Your browser does not support the video tag.
+          </video>
+          {% elif card2.image %}
           <img src="{{ card2.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 2 Image">
           {% endif %}
           {% if card2.prompt.text %}

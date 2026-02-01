@@ -51,6 +51,7 @@ class Card(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='cards', null=True)
     uploader = models.ForeignKey(Participant, on_delete=models.SET_NULL, null=True, blank=True, related_name='cards')
     image = models.ImageField(upload_to='card_images/', blank=True, null=True)
+    video = models.FileField(upload_to='card_videos/', blank=True, null=True)
     prompt = models.ForeignKey(Prompt, on_delete=models.SET_NULL, null=True, blank=True)
     answer = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -43,15 +43,25 @@
                  <div class="card-body bg-light p-4">
                     <h4 class="fw-bold mb-3">{{ card.prompt.text }}</h4>
                     <hr>
-                    {% if card.image %}
+                    {% if card.video %}
+                        <video controls preload="metadata" class="img-fluid rounded">
+                            <source src="{{ card.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% elif card.image %}
                         <img src="{{ card.image.url }}" class="img-fluid rounded" alt="Prompt Answer Image">
                     {% else %}
                         <p class="fs-4 fst-italic mb-0">"{{ card.answer }}"</p>
                     {% endif %}
                  </div>
             {% else %}
-                <!-- Photo Card Style -->
-                {% if card.image %}
+                <!-- Photo/Media Card Style -->
+                {% if card.video %}
+                    <video controls preload="metadata" class="card-img-top">
+                        <source src="{{ card.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% elif card.image %}
                     <img src="{{ card.image.url }}" class="card-img-top" alt="Profile Photo">
                 {% endif %}
                  {# Only show caption if it exists, though we removed it for photo cards earlier, good to be safe #}

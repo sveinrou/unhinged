@@ -19,7 +19,7 @@
           </div>
           {% endif %}
 
-          {# Render specific fields manually if it's the PromptCardForm to control layout #}
+          {# Check if form has a 'prompt' field to determine if it's PromptCardForm #}
           {% if form.prompt %}
             <div class="mb-3">
                 <label for="{{ form.prompt.id_for_label }}" class="form-label">{{ form.prompt.label }}</label>
@@ -34,11 +34,14 @@
             <div class="mb-3">
                 <label class="form-label">Svartype</label>
                 <div class="btn-group w-100" role="group" aria-label="Response Type">
-                    <input type="radio" class="btn-check" name="response_type" id="type_text" autocomplete="off" checked onchange="toggleInputs()">
+                    <input type="radio" class="btn-check" name="response_type" id="type_text" autocomplete="off" checked onchange="toggleInputs('prompt')">
                     <label class="btn btn-outline-primary" for="type_text">Tekst</label>
                   
-                    <input type="radio" class="btn-check" name="response_type" id="type_image" autocomplete="off" onchange="toggleInputs()">
+                    <input type="radio" class="btn-check" name="response_type" id="type_image" autocomplete="off" onchange="toggleInputs('prompt')">
                     <label class="btn btn-outline-primary" for="type_image">Bilde</label>
+
+                    <input type="radio" class="btn-check" name="response_type" id="type_video" autocomplete="off" onchange="toggleInputs('prompt')">
+                    <label class="btn btn-outline-primary" for="type_video">Video</label>
                 </div>
             </div>
 
@@ -62,24 +65,48 @@
                 {% endif %}
             </div>
 
-          {% else %}
-             {# Default rendering for ImageCardForm #}
-              {% for field in form %}
-              <div class="mb-3">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                <div class="form-text">{{ field.help_text }}</div>
-                {% endif %}
-                {% if field.errors %}
+            <div class="mb-3 d-none" id="video_input_container">
+                <label for="{{ form.video.id_for_label }}" class="form-label">{{ form.video.label }}</label>
+                {{ form.video }}
+                {% if form.video.errors %}
                 <div class="text-danger">
-                    {% for error in field.errors %}
-                        {{ error }}
-                    {% endfor %}
+                    {% for error in form.video.errors %}{{ error }}{% endfor %}
                 </div>
                 {% endif %}
-              </div>
-              {% endfor %}
+            </div>
+
+          {% else %} {# For MediaCardForm #}
+            <div class="mb-3">
+                <label class="form-label">Medietype</label>
+                <div class="btn-group w-100" role="group" aria-label="Media Type">
+                    <input type="radio" class="btn-check" name="media_type" id="media_image" autocomplete="off" checked onchange="toggleInputs('media')">
+                    <label class="btn btn-outline-primary" for="media_image">Bilde</label>
+                  
+                    <input type="radio" class="btn-check" name="media_type" id="media_video" autocomplete="off" onchange="toggleInputs('media')">
+                    <label class="btn btn-outline-primary" for="media_video">Video</label>
+                </div>
+            </div>
+
+            <div class="mb-3" id="media_image_input_container">
+                <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+                {{ form.image }}
+                {% if form.image.errors %}
+                <div class="text-danger">
+                    {% for error in form.image.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3 d-none" id="media_video_input_container">
+                <label for="{{ form.video.id_for_label }}" class="form-label">{{ form.video.label }}</label>
+                {{ form.video }}
+                {% if form.video.errors %}
+                <div class="text-danger">
+                    {% for error in form.video.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
           {% endif %}
           
           <button type="submit" class="btn btn-success mt-3">Send inn</button>
@@ -114,24 +141,65 @@
 </style>
 
 <script>
-    function toggleInputs() {
-        const textRadio = document.getElementById('type_text');
-        const textContainer = document.getElementById('text_input_container');
-        const imageContainer = document.getElementById('image_input_container');
-        const textInput = document.querySelector('[name="answer"]');
-        const imageInput = document.querySelector('[name="image"]');
+    function toggleInputs(formType) {
+        if (formType === 'prompt') {
+            const textRadio = document.getElementById('type_text');
+            const imageRadio = document.getElementById('type_image');
+            const videoRadio = document.getElementById('type_video');
 
-        if (textRadio.checked) {
-            textContainer.classList.remove('d-none');
-            imageContainer.classList.add('d-none');
-            // Clear image input
-            if(imageInput) imageInput.value = '';
-        } else {
+            const textContainer = document.getElementById('text_input_container');
+            const imageContainer = document.getElementById('image_input_container');
+            const videoContainer = document.getElementById('video_input_container');
+
+            const textInput = document.querySelector('#text_input_container [name="answer"]');
+            const imageInput = document.querySelector('#image_input_container [name="image"]');
+            const videoInput = document.querySelector('#video_input_container [name="video"]');
+
+            // Hide all and clear values
             textContainer.classList.add('d-none');
-            imageContainer.classList.remove('d-none');
-            // Clear text input
+            imageContainer.classList.add('d-none');
+            videoContainer.classList.add('d-none');
             if(textInput) textInput.value = '';
+            if(imageInput) imageInput.value = '';
+            if(videoInput) videoInput.value = '';
+
+            if (textRadio.checked) {
+                textContainer.classList.remove('d-none');
+            } else if (imageRadio.checked) {
+                imageContainer.classList.remove('d-none');
+            } else if (videoRadio.checked) {
+                videoContainer.classList.remove('d-none');
+            }
+        } else if (formType === 'media') {
+            const imageMediaRadio = document.getElementById('media_image');
+            const videoMediaRadio = document.getElementById('media_video');
+
+            const imageMediaContainer = document.getElementById('media_image_input_container');
+            const videoMediaContainer = document.getElementById('media_video_input_container');
+
+            const imageInput = document.querySelector('#media_image_input_container [name="image"]');
+            const videoInput = document.querySelector('#media_video_input_container [name="video"]');
+
+            // Hide all and clear values
+            imageMediaContainer.classList.add('d-none');
+            videoMediaContainer.classList.add('d-none');
+            if(imageInput) imageInput.value = '';
+            if(videoInput) videoInput.value = '';
+
+            if (imageMediaRadio.checked) {
+                imageMediaContainer.classList.remove('d-none');
+            } else if (videoMediaRadio.checked) {
+                videoMediaContainer.classList.remove('d-none');
+            }
         }
     }
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize based on which form is present
+        if (document.getElementById('type_text')) {
+            toggleInputs('prompt');
+        } else if (document.getElementById('media_image')) {
+            toggleInputs('media');
+        }
+    });
 </script>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Profile, Card, Duel, Prompt, Participant
-from .forms import ImageCardForm, PromptCardForm
+from .forms import MediaCardForm, PromptCardForm # Updated import
 import random
 from django.db.models import Count
 from .utils import calculate_elo, calculate_elo_history
@@ -25,9 +25,14 @@ def join_profile(request, profile_id):
     if request.session.get('profile_id') != profile.id:
         return redirect('index')
 
+    remembered_name = request.COOKIES.get('last_username')
+    
     if request.method == 'POST':
         name = request.POST.get('name')
         gender = request.POST.get('gender')
+        
+        response = redirect('profile_home', profile_id=profile.id) # Prepare response object
+        
         if name:
             # Get or create participant
             participant, created = Participant.objects.get_or_create(
@@ -35,13 +40,12 @@ def join_profile(request, profile_id):
                 name=name,
                 defaults={'gender': gender or 'O'}
             )
-            # If participant existed but logic allows updating (not strictly requested but good for safety), 
-            # we keep existing data. Here we assume name is unique identifier per profile.
             
             request.session['participant_id'] = participant.id
-            return redirect('profile_home', profile_id=profile.id)
+            response.set_cookie('last_username', name, max_age=365 * 24 * 60 * 60) # Remember for 1 year
+            return response
             
-    return render(request, 'join_profile.html', {'profile': profile})
+    return render(request, 'join_profile.html', {'profile': profile, 'remembered_name': remembered_name})
 
 def profile_home(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id)
@@ -57,7 +61,7 @@ def profile_home(request, profile_id):
     
     return render(request, 'profile_home.html', {'profile': profile, 'participant': participant})
 
-def upload_image_card(request, profile_id):
+def upload_media_card(request, profile_id): # Renamed
     profile = get_object_or_404(Profile, id=profile_id)
     if request.session.get('profile_id') != profile.id:
         return redirect('index')
@@ -68,7 +72,7 @@ def upload_image_card(request, profile_id):
     participant = get_object_or_404(Participant, id=participant_id)
 
     if request.method == 'POST':
-        form = ImageCardForm(request.POST, request.FILES)
+        form = MediaCardForm(request.POST, request.FILES) # Changed form
         if form.is_valid():
             card = form.save(commit=False)
             card.profile = profile
@@ -76,9 +80,9 @@ def upload_image_card(request, profile_id):
             card.save()
             return redirect('profile_home', profile_id=profile.id)
     else:
-        form = ImageCardForm()
+        form = MediaCardForm() # Changed form
     
-    return render(request, 'upload_card.html', {'form': form, 'profile': profile, 'title': 'Last opp bildekort'})
+    return render(request, 'upload_card.html', {'form': form, 'profile': profile, 'title': 'Last opp media'}) # Generic title
 
 def upload_prompt_card(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id)

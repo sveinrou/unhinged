@@ -51,7 +51,7 @@
             <thead class="table-dark">
               <tr>
                 <th scope="col">Rang</th>
-                <th scope="col">Bilde</th>
+                <th scope="col">Media</th> {# Changed from Bilde #}
                 <th scope="col">Elo</th>
                 <th scope="col">Vunnet</th>
                 <th scope="col">Tapt</th>
@@ -63,10 +63,12 @@
               <tr>
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>
-                    {% if card.image %}
+                    {% if card.video %}
+                    <span class="text-muted">Video</span> 
+                    {% elif card.image %}
                     <img src="{{ card.image.url }}" alt="Card Image" style="height: 60px; width: auto; object-fit: contain;">
                     {% else %}
-                    <span class="text-muted">Ingen bilde</span>
+                    <span class="text-muted">Ingen media</span>
                     {% endif %}
                 </td>
                 <td>{{ card.elo_rating|stringformat:".0f" }}</td>
@@ -107,6 +109,8 @@
                 <td>
                     {% if card.answer %}
                         {{ card.answer }}
+                    {% elif card.video %}
+                        <span class="text-muted">Video</span>
                     {% elif card.image %}
                         <img src="{{ card.image.url }}" alt="Answer Image" style="height: 60px; width: auto; object-fit: contain;">
                     {% endif %}
