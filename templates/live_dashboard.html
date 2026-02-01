@@ -51,8 +51,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0/dist/chartjs-adapter-moment.min.js"></script>
 
 <script>
     const ctx = document.getElementById('eloChart').getContext('2d');
@@ -68,16 +66,10 @@
                 responsive: true,
                 scales: {
                     x: {
-                        type: 'time',
-                        time: {
-                            unit: 'minute',
-                            displayFormats: {
-                                minute: 'HH:mm'
-                            }
-                        },
+                        type: 'linear', // Changed from 'time'
                         title: {
                             display: true,
-                            text: 'Tid'
+                            text: 'Duell-indeks' // Changed title
                         }
                     },
                     y: {

@@ -47,7 +47,7 @@ def calculate_elo_history(cards, duels, initial_rating=1200.0, k_factor=32):
     # History: card_id -> list of points
     history = {card.id: [] for card in cards}
     
-    for duel in duels:
+    for i, duel in enumerate(duels): # Enumerate duels to get index
         winner_id = duel.winner_id
         loser_id = duel.loser_id
 
@@ -67,8 +67,8 @@ def calculate_elo_history(cards, duels, initial_rating=1200.0, k_factor=32):
         ratings[winner_id] = w_new
         ratings[loser_id] = l_new
         
-        # Append to history
-        history[winner_id].append({'x': duel.created_at.isoformat(), 'y': w_new})
-        history[loser_id].append({'x': duel.created_at.isoformat(), 'y': l_new})
+        # Append to history with duel index
+        history[winner_id].append({'x': i + 1, 'y': w_new}) # Duel index (1-based)
+        history[loser_id].append({'x': i + 1, 'y': l_new})
 
     return history

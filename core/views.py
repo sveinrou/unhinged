@@ -302,10 +302,10 @@ def live_dashboard_chart_data(request, profile_id):
         # Actually calculate_elo_history only adds points on change.
         # We can prepend the start.
         if not data_points:
-             data_points = [{'x': profile.created_at.isoformat(), 'y': 1200.0}]
+             data_points = [{'x': 0, 'y': 1200.0}] # Start at duel 0
         else:
-             # Prepend initial state at profile creation time for nice graph start
-             data_points.insert(0, {'x': profile.created_at.isoformat(), 'y': 1200.0})
+             # Prepend initial state at duel 0
+             data_points.insert(0, {'x': 0, 'y': 1200.0})
              
         datasets.append({
             'label': label,
