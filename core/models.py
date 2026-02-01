@@ -1,6 +1,12 @@
 from django.db import models
 import random
 import string
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+import pillow_heif
+
+pillow_heif.register_heif_opener()
 
 class Prompt(models.Model):
     text = models.CharField(max_length=255)
@@ -47,6 +53,16 @@ class Card(models.Model):
     prompt = models.ForeignKey(Prompt, on_delete=models.SET_NULL, null=True, blank=True)
     answer = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.image and self.image.name.lower().endswith('.heic'):
+            image = Image.open(self.image)
+            image = image.convert('RGB')
+            buffer = BytesIO()
+            image.save(buffer, format="JPEG")
+            new_name = self.image.name.lower().replace('.heic', '.jpg')
+            self.image.save(new_name, ContentFile(buffer.getvalue()), save=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         prompt_text = self.prompt.text if self.prompt else "No Prompt"
