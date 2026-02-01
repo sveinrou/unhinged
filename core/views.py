@@ -13,7 +13,20 @@ def index(request):
         try:
             profile = Profile.objects.get(password=password)
             request.session['profile_id'] = profile.id
-            # Redirect to join page instead of home
+
+            # Check if a participant is already logged in for this profile
+            participant_id = request.session.get('participant_id')
+            if participant_id:
+                try:
+                    participant = Participant.objects.get(id=participant_id, profile=profile)
+                    # If the participant exists and belongs to this profile, go straight to home
+                    return redirect('profile_home', profile_id=profile.id)
+                except Participant.DoesNotExist:
+                    # Participant ID in session is invalid or belongs to another profile
+                    # Fall through to join_profile
+                    pass
+
+            # If no valid participant in session for this profile, redirect to join page
             return redirect('join_profile', profile_id=profile.id)
         except Profile.DoesNotExist:
             error = "Ugyldig passord. Vennligst prøv igjen."
