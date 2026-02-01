@@ -14,11 +14,17 @@
     </div>
     
     <hr>
+    {% if profile.voting_enabled %}
     <h3>Bedømming</h3>
     <div class="d-grid gap-3 col-md-6 mx-auto mb-4">
         <a href="{% url 'rank_cards' profile.id 'image' %}" class="btn btn-outline-primary btn-lg">Ranger bildekort</a>
         <a href="{% url 'rank_cards' profile.id 'prompt' %}" class="btn btn-outline-secondary btn-lg">Ranger promptkort</a>
     </div>
+    {% else %}
+    <div class="alert alert-secondary text-center">
+        Stemming er for øyeblikket deaktivert.
+    </div>
+    {% endif %}
 
     <hr>
     {% if profile.results_available %}
@@ -29,7 +35,7 @@
     </div>
     {% else %}
     <div class="alert alert-secondary text-center">
-        Resultatene er foreløpig skjult. Fortsett å stemme!
+        Resultatene er foreløpig skjult
     </div>
     {% endif %}
 

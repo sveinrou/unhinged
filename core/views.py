@@ -108,6 +108,9 @@ def rank_cards(request, profile_id, card_type):
     if request.session.get('profile_id') != profile.id:
         return redirect('index')
 
+    if not profile.voting_enabled:
+        return redirect('profile_home', profile_id=profile.id) # Redirect if voting is disabled
+
     participant_id = request.session.get('participant_id')
     if not participant_id:
          return redirect('join_profile', profile_id=profile.id)
