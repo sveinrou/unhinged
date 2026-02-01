@@ -3,6 +3,7 @@
 {% block content %}
 <div class="row">
   <div class="col">
+    <h1> Trykk på den du liker best </h1>
     <a href="{% url 'profile_home' profile.id %}" class="btn btn-outline-secondary btn-sm mb-0">Tilbake til hjem</a>
   </div>
 </div>
@@ -15,18 +16,19 @@
     </div>
     {% else %}
     
-    {% if card1.prompt %}
-    <div class="mb-0">
-        <h3>Prompt: {{ card1.prompt.text }}</h3>
-    </div>
     {% endif %}
 
     <div class="row g-0 flex-grow-1">
       <!-- Card 1 -->
-      <div class="col-12 col-md-6 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
-        <div class="card h-100 shadow-sm hover-hover border-0">
+      <div class="col-12 col-md-5 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
+        <div class="card h-100 shadow-sm hover-hover p-3">
           {% if card1.image %}
           <img src="{{ card1.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 1 Image">
+          {% endif %}
+          {% if card1.prompt %}
+          <div class="mb-3">
+            <h3>{{ card1.prompt.text }}</h3>
+          </div>
           {% endif %}
           {% if card1.answer %} {# This applies to text-only prompt cards or image cards with captions (which we removed) #}
           <div class="card-body px-1 py-0">
@@ -36,11 +38,22 @@
         </div>
       </div>
 
+      {% if card1.prompt %}
+      <div class="col-md-1">
+        Eller
+      </div>
+      {% endif %}
+
       <!-- Card 2 -->
-      <div class="col-12 col-md-6 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
-        <div class="card h-100 shadow-sm border-0">
+      <div class="col-12 col-md-5 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
+        <div class="card h-100 shadow-sm border rounded p-3">
            {% if card2.image %}
           <img src="{{ card2.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 2 Image">
+          {% endif %}
+          {% if card2.prompt.text %}
+          <div class="mb-3">
+            <h3>{{ card1.prompt.text }}</h3>
+          </div>
           {% endif %}
           {% if card2.answer %} {# This applies to text-only prompt cards or image cards with captions #}
           <div class="card-body px-1 py-0">
@@ -62,8 +75,6 @@
         <input type="hidden" name="winner" value="{{ card2.id }}">
         <input type="hidden" name="loser" value="{{ card1.id }}">
     </form>
-    
-    {% endif %}
   </div>
 </div>
 <style>
