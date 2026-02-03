@@ -367,7 +367,7 @@ def live_dashboard_chart_data(request, profile_id):
     for card in cards:
         card.elo_rating = final_ratings[card.id]['rating']
     cards.sort(key=lambda x: x.elo_rating, reverse=True)
-    top_cards = cards[:10] # Top 10
+    # top_cards = cards[:10] # Top 10 - REMOVED limit
     
     datasets = []
     colors = [
@@ -375,7 +375,7 @@ def live_dashboard_chart_data(request, profile_id):
         '#FF9F40', '#E7E9ED', '#767676', '#52D726', '#FF0000'
     ]
     
-    for i, card in enumerate(top_cards):
+    for i, card in enumerate(cards): # Iterate over all cards
         # Label: Truncate long prompts/answers
         label = str(card)
         if len(label) > 20:
