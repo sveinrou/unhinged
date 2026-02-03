@@ -284,15 +284,26 @@ def card_detail(request, profile_id, card_id):
     
     # Calculate ELO to show current rating
     cards = list(Card.objects.filter(profile=profile))
-    duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge'))
+    duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge').order_by('created_at'))
     ratings = calculate_elo(cards, duels)
     
     current_rating = ratings.get(card.id, {}).get('rating', 1200.0)
     
+    # Calculate ELO history for this specific card
+    history = calculate_elo_history(cards, duels)
+    card_history = history.get(card.id, [])
+    
+    # Prepend initial state
+    if not card_history:
+         card_history = [{'x': 0, 'y': 1200.0}]
+    else:
+         card_history.insert(0, {'x': 0, 'y': 1200.0})
+
     return render(request, 'card_detail.html', {
         'profile': profile,
         'card': card,
-        'elo_rating': current_rating
+        'elo_rating': current_rating,
+        'elo_history': card_history
     })
 
 def delete_card(request, profile_id, card_id):

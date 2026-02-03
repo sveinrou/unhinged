@@ -59,13 +59,58 @@
         </div>
     </div>
     
-    <div class="text-center mt-4">
-        <form method="POST" action="{% url 'delete_card' profile.id card.id %}" onsubmit="return confirm('Er du sikker på at du vil slette dette kortet? Dette kan ikke angres.');">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Slett kort</button>
-        </form>
+    <div class="card mt-4 shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="card-title">Elo-historikk</h5>
+            <canvas id="eloChart"></canvas>
+        </div>
     </div>
-
+    
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('eloChart').getContext('2d');
+    const historyData = {{ elo_history|safe }};
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Elo Rating',
+                data: historyData,
+                borderColor: '#36A2EB',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'linear',
+                    title: {
+                        display: true,
+                        text: 'Duell-indeks'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Elo Rating'
+                    },
+                    suggestedMin: 1000,
+                    suggestedMax: 1400
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
