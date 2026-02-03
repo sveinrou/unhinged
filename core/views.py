@@ -73,6 +73,10 @@ def profile_home(request, profile_id):
     
     participant = get_object_or_404(Participant, id=participant_id)
     
+    # If random_prompts_mode is on, and the user hasn't submitted a prompt card yet, redirect them
+    if profile.random_prompts_mode:
+         return redirect('upload_prompt_card', profile_id=profile.id)
+
     return render(request, 'profile_home.html', {'profile': profile, 'participant': participant})
 
 def upload_media_card(request, profile_id): # Renamed

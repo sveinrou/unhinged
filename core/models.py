@@ -69,7 +69,7 @@ class Card(models.Model):
 
     def __str__(self):
         prompt_text = self.prompt.text if self.prompt else "No Prompt"
-        return f"{self.profile.name} - {prompt_text}: {self.answer}"
+        return f"{self.uploader.name} - {prompt_text}: {self.answer}"
 
 class Duel(models.Model):
     winner = models.ForeignKey(Card, on_delete=models.CASCADE, related_name='won_duels')
