@@ -215,33 +215,24 @@ def rank_cards(request, profile_id, card_type):
             card2 = random.choices(candidates, weights=weights, k=1)[0]
             
     elif card_type == 'prompt':
-        # Group by prompt
-        prompts_dict = {}
-        for c in all_cards:
-            if c.prompt:
-                if c.prompt.id not in prompts_dict:
-                    prompts_dict[c.prompt.id] = []
-                prompts_dict[c.prompt.id].append(c)
+        # Pool ALL prompt cards and select two based on weights, allowing cross-prompt comparison
+        candidates = [c for c in all_cards if c.prompt]
         
-        # Filter valid prompts (>= 2 cards)
-        valid_prompts_ids = [pid for pid, cards in prompts_dict.items() if len(cards) >= 2]
-        
-        if valid_prompts_ids:
-            # Pick random prompt (unweighted for now)
-            selected_prompt_id = random.choice(valid_prompts_ids)
-            candidates = prompts_dict[selected_prompt_id]
-            
+        if len(candidates) >= 2:
             # Calculate weights
             weights = []
             for c in candidates:
                 s = stats.get(c.id, {'won': 0, 'lost': 0})
                 w = (s['won'] + 1) / (s['won'] + s['lost'] + 2)
                 weights.append(w)
-                
+            
+            # Weighted selection without replacement
             card1 = random.choices(candidates, weights=weights, k=1)[0]
+            
             idx = candidates.index(card1)
             candidates.pop(idx)
             weights.pop(idx)
+            
             card2 = random.choices(candidates, weights=weights, k=1)[0]
 
     if not card1 or not card2:
@@ -294,6 +285,10 @@ def stats(request, profile_id):
         card.elo_rating = r['rating']
         card.won_count = r['won']
         card.lost_count = r['lost']
+        
+        # Calculate selection weight using Laplace smoothing
+        total_duels = r['won'] + r['lost']
+        card.selection_weight = ((r['won'] + 1) / (total_duels + 2)) * 100 # As percentage
         
     # Sort by ELO
     cards.sort(key=lambda x: x.elo_rating, reverse=True)

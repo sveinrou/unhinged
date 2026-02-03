@@ -16,12 +16,17 @@
     </div>
     {% else %}
     
-    {% endif %}
-
-    <div class="row g-0 flex-grow-1">
+    <div class="row align-items-center g-0 flex-grow-1 justify-content-center">
       <!-- Card 1 -->
-      <div class="col-12 col-md-5 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
-        <div class="card h-100 shadow-sm hover-hover p-3">
+      <div class="col-12 col-md-5 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
+        <div class="card h-100 shadow-sm hover-hover border border-rounded">
+          {% if card1.prompt %}
+          <div class="card-header bg-transparent border-0 pt-3 pb-0">
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Prompt</h6>
+            <h5 class="card-title">{{ card1.prompt.text }}</h5>
+          </div>
+          {% endif %}
+          
           {% if card1.video %}
           <video controls preload="metadata" class="card-img-top img-fluid ranking-image d-block mx-auto">
               <source src="{{ card1.video.url }}" type="video/mp4">
@@ -30,28 +35,25 @@
           {% elif card1.image %}
           <img src="{{ card1.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 1 Image">
           {% endif %}
-          {% if card1.prompt %}
-          <div class="mb-3">
-            <h3>{{ card1.prompt.text }}</h3>
-          </div>
-          {% endif %}
-          {% if card1.answer %} {# This applies to text-only prompt cards or image cards with captions (which we removed) #}
-          <div class="card-body px-1 py-0">
+          
+          {% if card1.answer %} 
+          <div class="card-body px-1 py-0 {% if card1.prompt %}pt-2{% endif %}">
             <p class="card-text fs-6 mb-1">{{ card1.answer }}</p>
           </div>
           {% endif %}
         </div>
       </div>
 
-      {% if card1.prompt %}
-      <div class="col-md-1">
-        Eller
-      </div>
-      {% endif %}
-
       <!-- Card 2 -->
-      <div class="col-12 col-md-5 my-1 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
-        <div class="card h-100 shadow-sm border rounded p-3">
+      <div class="col-12 col-md-5 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
+        <div class="card h-100 shadow-sm border border-rounded">
+          {% if card2.prompt %}
+          <div class="card-header bg-transparent border-0 pt-3 pb-0">
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Prompt</h6>
+            <h5 class="card-title">{{ card2.prompt.text }}</h5>
+          </div>
+          {% endif %}
+
            {% if card2.video %}
           <video controls preload="metadata" class="card-img-top img-fluid ranking-image d-block mx-auto">
               <source src="{{ card2.video.url }}" type="video/mp4">
@@ -60,13 +62,9 @@
           {% elif card2.image %}
           <img src="{{ card2.image.url }}" class="card-img-top img-fluid ranking-image d-block mx-auto" alt="Card 2 Image">
           {% endif %}
-          {% if card2.prompt.text %}
-          <div class="mb-3">
-            <h3>{{ card1.prompt.text }}</h3>
-          </div>
-          {% endif %}
-          {% if card2.answer %} {# This applies to text-only prompt cards or image cards with captions #}
-          <div class="card-body px-1 py-0">
+          
+          {% if card2.answer %} 
+          <div class="card-body px-1 py-0 {% if card2.prompt %}pt-2{% endif %}">
             <p class="card-text fs-6 mb-1">{{ card2.answer }}</p>
           </div>
           {% endif %}
@@ -85,6 +83,7 @@
         <input type="hidden" name="winner" value="{{ card2.id }}">
         <input type="hidden" name="loser" value="{{ card1.id }}">
     </form>
+    {% endif %}
   </div>
 </div>
 <style>
