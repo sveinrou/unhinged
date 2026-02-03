@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.forms import HiddenInput
 from .models import Profile, Card, Duel, Prompt, Participant
-from .forms import MediaCardForm, PromptCardForm # Updated import
+from .forms import MediaCardForm, PromptCardForm
 import random
 from django.db.models import Count
 from .utils import calculate_elo, calculate_elo_history
@@ -107,18 +108,46 @@ def upload_prompt_card(request, profile_id):
         return redirect('join_profile', profile_id=profile.id)
     participant = get_object_or_404(Participant, id=participant_id)
 
+    assigned_prompt = None
+    if profile.random_prompts_mode:
+        # Get a random prompt that has not been answered by this participant for this profile yet
+        # (or just a random prompt if we allow multiple answers to same prompt)
+        # For simplicity, let's just get a random prompt from all available.
+        available_prompts = Prompt.objects.all()
+        if available_prompts.exists():
+            assigned_prompt = random.choice(list(available_prompts))
+        else:
+            # Handle case with no prompts available
+            return render(request, 'upload_card.html', {'form': None, 'profile': profile, 'title': 'Svar på en prompt', 'error': 'Ingen prompter tilgjengelig.'})
+
+
     if request.method == 'POST':
         form = PromptCardForm(request.POST, request.FILES)
         if form.is_valid():
             card = form.save(commit=False)
             card.profile = profile
             card.uploader = participant
+            
+            if profile.random_prompts_mode and assigned_prompt:
+                card.prompt = assigned_prompt # Assign the pre-selected random prompt
+            
             card.save()
             return redirect('profile_home', profile_id=profile.id)
     else:
-        form = PromptCardForm()
+        # For GET request, if in random mode, pre-fill the form's prompt field
+        if profile.random_prompts_mode and assigned_prompt:
+            form = PromptCardForm(initial={'prompt': assigned_prompt})
+            form.fields['prompt'].widget = HiddenInput() # Hidden, but we'll show its text in template
+        else:
+            form = PromptCardForm()
     
-    return render(request, 'upload_card.html', {'form': form, 'profile': profile, 'title': 'Svar på en prompt'})
+    return render(request, 'upload_card.html', {
+        'form': form, 
+        'profile': profile, 
+        'title': 'Svar på en prompt',
+        'random_prompts_mode': profile.random_prompts_mode,
+        'assigned_prompt': assigned_prompt # Pass to template for display
+    })
 
 def rank_cards(request, profile_id, card_type):
     profile = get_object_or_404(Profile, id=profile_id)

@@ -20,6 +20,7 @@ class Profile(models.Model):
     password = models.CharField(max_length=128, blank=True, help_text="Leave blank to auto-generate an 8-letter password.") 
     results_available = models.BooleanField(default=False, help_text="Check this to reveal the results buttons to users.")
     voting_enabled = models.BooleanField(default=True, help_text="Check this to enable voting and card submission for this profile.")
+    random_prompts_mode = models.BooleanField(default=False, help_text="If checked, participants will be assigned a random prompt instead of choosing.")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):

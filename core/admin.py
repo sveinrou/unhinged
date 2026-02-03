@@ -2,8 +2,8 @@ from django.contrib import admin
 from .models import Card, Prompt, Profile, Duel, Participant
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'password', 'results_available', 'voting_enabled', 'created_at')
-    list_editable = ('results_available', 'voting_enabled')
+    list_display = ('name', 'password', 'results_available', 'voting_enabled', 'random_prompts_mode', 'created_at')
+    list_editable = ('results_available', 'voting_enabled', 'random_prompts_mode')
 
 admin.site.register(Card)
 admin.site.register(Prompt)
