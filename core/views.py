@@ -267,6 +267,47 @@ def stats(request, profile_id):
         'participants': participants
     })
 
+    return render(request, 'final_results.html', {
+        'profile': profile, 
+        'final_list': final_list,
+        'participants': participants,
+        'filter_by': filter_by,
+        'filter_label': filter_label
+    })
+
+def card_detail(request, profile_id, card_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    if request.session.get('profile_id') != profile.id:
+        return redirect('index')
+    
+    card = get_object_or_404(Card, id=card_id, profile=profile)
+    
+    # Calculate ELO to show current rating
+    cards = list(Card.objects.filter(profile=profile))
+    duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge'))
+    ratings = calculate_elo(cards, duels)
+    
+    current_rating = ratings.get(card.id, {}).get('rating', 1200.0)
+    
+    return render(request, 'card_detail.html', {
+        'profile': profile,
+        'card': card,
+        'elo_rating': current_rating
+    })
+
+def delete_card(request, profile_id, card_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    if request.session.get('profile_id') != profile.id:
+        return redirect('index')
+        
+    card = get_object_or_404(Card, id=card_id, profile=profile)
+    
+    if request.method == 'POST':
+        card.delete()
+        return redirect('stats', profile_id=profile.id)
+        
+    return redirect('card_detail', profile_id=profile.id, card_id=card.id)
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 

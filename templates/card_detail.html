@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+  <div class="col-md-8 mx-auto">
+    <div class="text-center mb-4">
+      <h1>Kortdetaljer</h1>
+      <a href="{% url 'stats' profile.id %}" class="btn btn-outline-secondary btn-sm mt-2">Tilbake til statistikk</a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        {% if card.prompt %}
+            <!-- Prompt Card Style -->
+             <div class="card-body bg-light p-4">
+                <h4 class="fw-bold mb-3">{{ card.prompt.text }}</h4>
+                <hr>
+                {% if card.video %}
+                    <video controls preload="metadata" class="img-fluid rounded w-100">
+                        <source src="{{ card.video.url }}" type="video/mp4">
+                        Din nettleser støtter ikke videotaggen.
+                    </video>
+                {% elif card.image %}
+                    <img src="{{ card.image.url }}" class="img-fluid rounded w-100" alt="Prompt Svarbilde">
+                {% else %}
+                    <p class="fs-4 fst-italic mb-0">"{{ card.answer }}"</p>
+                {% endif %}
+             </div>
+        {% else %}
+            <!-- Photo/Media Card Style -->
+            {% if card.video %}
+                <video controls preload="metadata" class="card-img-top w-100">
+                    <source src="{{ card.video.url }}" type="video/mp4">
+                    Din nettleser støtter ikke videotaggen.
+                </video>
+            {% elif card.image %}
+                <img src="{{ card.image.url }}" class="card-img-top w-100" alt="Profilbilde">
+            {% endif %}
+             {# Only show caption if it exists #}
+            {% if card.answer %}
+            <div class="card-body">
+                <p class="card-text">{{ card.answer }}</p>
+            </div>
+            {% endif %}
+        {% endif %}
+        
+        <div class="card-footer bg-white border-top-0">
+            <div class="row">
+                <div class="col-6">
+                    <small class="text-muted">
+                        Innsendt av: <strong>{{ card.uploader.name|default:"Anonym" }}</strong>
+                    </small>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-muted">
+                        Elo: <strong>{{ elo_rating|stringformat:".0f" }}</strong>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <form method="POST" action="{% url 'delete_card' profile.id card.id %}" onsubmit="return confirm('Er du sikker på at du vil slette dette kortet? Dette kan ikke angres.');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Slett kort</button>
+        </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

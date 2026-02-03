@@ -60,7 +60,7 @@
             </thead>
             <tbody>
               {% for card in image_cards %}
-              <tr>
+              <tr onclick="window.location='{% url 'card_detail' profile.id card.id %}';" style="cursor: pointer;">
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>
                     {% if card.video %}
@@ -103,7 +103,7 @@
             </thead>
             <tbody>
               {% for card in prompt_cards %}
-              <tr>
+              <tr onclick="window.location='{% url 'card_detail' profile.id card.id %}';" style="cursor: pointer;">
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ card.prompt.text }}</td>
                 <td>
