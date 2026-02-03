@@ -182,22 +182,67 @@ def rank_cards(request, profile_id, card_type):
     card1 = None
     card2 = None
     
+    # Fetch all data for weighting logic
+    # We prioritize cards with higher win rates using Laplace smoothing: (wins + 1) / (total + 2)
+    # This ensures bad cards (low win rate) appear less often.
+    
+    all_cards = list(Card.objects.filter(profile=profile).select_related('prompt'))
+    all_duels = list(Duel.objects.filter(winner__profile=profile))
+    
+    # Calculate current stats
+    stats = calculate_elo(all_cards, all_duels)
+    
+    candidates = []
+    
     if card_type == 'image':
-        cards = Card.objects.filter(prompt__isnull=True)
-        count = cards.count()
-        if count >= 2:
-            random_indices = random.sample(range(count), 2)
-            card1 = cards[random_indices[0]]
-            card2 = cards[random_indices[1]]
+        candidates = [c for c in all_cards if c.prompt is None]
+        
+        if len(candidates) >= 2:
+            # Calculate weights
+            weights = []
+            for c in candidates:
+                s = stats.get(c.id, {'won': 0, 'lost': 0})
+                w = (s['won'] + 1) / (s['won'] + s['lost'] + 2)
+                weights.append(w)
+            
+            # Weighted selection without replacement
+            card1 = random.choices(candidates, weights=weights, k=1)[0]
+            
+            idx = candidates.index(card1)
+            candidates.pop(idx)
+            weights.pop(idx)
+            
+            card2 = random.choices(candidates, weights=weights, k=1)[0]
             
     elif card_type == 'prompt':
-        # Find prompts with at least 2 cards
-        prompts_with_cards = Prompt.objects.annotate(card_count=Count('card')).filter(card_count__gte=2)
-        if prompts_with_cards.exists():
-            selected_prompt = random.choice(list(prompts_with_cards))
-            cards = selected_prompt.card_set.all()
-            if cards.count() >= 2:
-                card1, card2 = random.sample(list(cards), 2)
+        # Group by prompt
+        prompts_dict = {}
+        for c in all_cards:
+            if c.prompt:
+                if c.prompt.id not in prompts_dict:
+                    prompts_dict[c.prompt.id] = []
+                prompts_dict[c.prompt.id].append(c)
+        
+        # Filter valid prompts (>= 2 cards)
+        valid_prompts_ids = [pid for pid, cards in prompts_dict.items() if len(cards) >= 2]
+        
+        if valid_prompts_ids:
+            # Pick random prompt (unweighted for now)
+            selected_prompt_id = random.choice(valid_prompts_ids)
+            candidates = prompts_dict[selected_prompt_id]
+            
+            # Calculate weights
+            weights = []
+            for c in candidates:
+                s = stats.get(c.id, {'won': 0, 'lost': 0})
+                w = (s['won'] + 1) / (s['won'] + s['lost'] + 2)
+                weights.append(w)
+                
+            card1 = random.choices(candidates, weights=weights, k=1)[0]
+            idx = candidates.index(card1)
+            candidates.pop(idx)
+            weights.pop(idx)
+            card2 = random.choices(candidates, weights=weights, k=1)[0]
 
     if not card1 or not card2:
         return render(request, 'rank.html', {'profile': profile, 'error': 'Ikke nok kort til å rangere!', 'card_type': card_type})
