@@ -251,7 +251,7 @@ def stats(request, profile_id):
     cards = list(Card.objects.filter(profile=profile))
     
     # Get all duels relevant to this profile
-    all_duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge'))
+    all_duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge').order_by('created_at'))
     
     # Apply filters
     filtered_duels = []
@@ -305,14 +305,6 @@ def stats(request, profile_id):
         'filter_by': filter_by,
         'filter_label': filter_label,
         'participants': participants
-    })
-
-    return render(request, 'final_results.html', {
-        'profile': profile, 
-        'final_list': final_list,
-        'participants': participants,
-        'filter_by': filter_by,
-        'filter_label': filter_label
     })
 
 def card_detail(request, profile_id, card_id):
