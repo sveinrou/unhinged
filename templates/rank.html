@@ -18,11 +18,12 @@
     
     <div class="row align-items-center g-0 flex-grow-1 justify-content-center">
       <!-- Card 1 -->
-      <div class="col-12 col-md-5 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
-        <div class="card h-100 shadow-sm hover-hover border border-rounded w-75 py-3">
+      <div class="col-12 col-md-5 d-flex align-items-center justify-content-center"> {# Removed clickable-card and onclick #}
+        <div class="card h-100 shadow-sm hover-hover border-0">
           {% if card1.prompt %}
-          <div class="card-header bg-transparent border-0 pt-1 pb-0">
-            <h6 class="card-title">{{ card1.prompt.text }}</h6>
+          <div class="card-header bg-transparent border-0 pt-3 pb-0">
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Prompt</h6>
+            <h5 class="card-title">{{ card1.prompt.text }}</h5>
           </div>
           {% endif %}
           
@@ -40,15 +41,25 @@
             <p class="card-text fs-6 mb-1">{{ card1.answer }}</p>
           </div>
           {% endif %}
+            {# Re-added form and button #}
+            <div class="card-footer bg-white border-top-0 pt-0">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="winner" value="{{ card1.id }}">
+                    <input type="hidden" name="loser" value="{{ card2.id }}">
+                    <button type="submit" class="btn btn-success btn-sm w-100 mt-1">Stem</button>
+                </form>
+            </div>
         </div>
       </div>
 
       <!-- Card 2 -->
-      <div class="col-12 col-md-5 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
-        <div class="card h-100 shadow-sm border border-rounded w-75 py-3">
+      <div class="col-12 col-md-5 d-flex align-items-center justify-content-center"> {# Removed clickable-card and onclick #}
+        <div class="card h-100 shadow-sm border-0">
           {% if card2.prompt %}
-          <div class="card-header bg-transparent border-0 pt-1 pb-0">
-            <h6 class="card-title">{{ card2.prompt.text }}</h6>
+          <div class="card-header bg-transparent border-0 pt-3 pb-0">
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Prompt</h6>
+            <h5 class="card-title">{{ card2.prompt.text }}</h5>
           </div>
           {% endif %}
 
@@ -66,21 +77,21 @@
             <p class="card-text fs-6 mb-1">{{ card2.answer }}</p>
           </div>
           {% endif %}
+            {# Re-added form and button #}
+            <div class="card-footer bg-white border-top-0 pt-0">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="winner" value="{{ card2.id }}">
+                    <input type="hidden" name="loser" value="{{ card1.id }}">
+                    <button type="submit" class="btn btn-success btn-sm w-100 mt-1">Stem</button>
+                </form>
+            </div>
         </div>
       </div>
     </div>
 
-    <!-- Hidden forms for voting -->
-    <form id="voteForm1" method="post" action="{% url 'rank_cards' profile.id card_type %}" style="display: none;">
-        {% csrf_token %}
-        <input type="hidden" name="winner" value="{{ card1.id }}">
-        <input type="hidden" name="loser" value="{{ card2.id }}">
-    </form>
-    <form id="voteForm2" method="post" action="{% url 'rank_cards' profile.id card_type %}" style="display: none;">
-        {% csrf_token %}
-        <input type="hidden" name="winner" value="{{ card2.id }}">
-        <input type="hidden" name="loser" value="{{ card1.id }}">
-    </form>
+    {# Removed hidden forms for voting as they are no longer needed #}
+    
     {% endif %}
   </div>
 </div>
@@ -107,12 +118,6 @@
         max-height: 45vh; /* Max height 45% of viewport height */
         object-fit: contain;
         width: 100%; /* Ensure it takes full width of its container */
-    }
-    .clickable-card {
-        cursor: pointer;
-    }
-    .clickable-card:hover .shadow-sm {
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; /* Re-apply hover shadow */
     }
     @media (max-width: 767.98px) { /* Adjust for smaller screens */
         .ranking-image {
