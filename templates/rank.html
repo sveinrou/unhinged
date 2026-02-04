@@ -19,11 +19,10 @@
     <div class="row align-items-center g-0 flex-grow-1 justify-content-center">
       <!-- Card 1 -->
       <div class="col-12 col-md-5 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm1').submit();">
-        <div class="card h-100 shadow-sm hover-hover border border-rounded">
+        <div class="card h-100 shadow-sm hover-hover border border-rounded w-75 py-3">
           {% if card1.prompt %}
-          <div class="card-header bg-transparent border-0 pt-3 pb-0">
-            <h6 class="text-muted text-uppercase small fw-bold mb-1">Prompt</h6>
-            <h5 class="card-title">{{ card1.prompt.text }}</h5>
+          <div class="card-header bg-transparent border-0 pt-1 pb-0">
+            <h6 class="card-title">{{ card1.prompt.text }}</h6>
           </div>
           {% endif %}
           
@@ -46,11 +45,10 @@
 
       <!-- Card 2 -->
       <div class="col-12 col-md-5 d-flex align-items-center justify-content-center clickable-card" onclick="document.getElementById('voteForm2').submit();">
-        <div class="card h-100 shadow-sm border border-rounded">
+        <div class="card h-100 shadow-sm border border-rounded w-75 py-3">
           {% if card2.prompt %}
-          <div class="card-header bg-transparent border-0 pt-3 pb-0">
-            <h6 class="text-muted text-uppercase small fw-bold mb-1">Prompt</h6>
-            <h5 class="card-title">{{ card2.prompt.text }}</h5>
+          <div class="card-header bg-transparent border-0 pt-1 pb-0">
+            <h6 class="card-title">{{ card2.prompt.text }}</h6>
           </div>
           {% endif %}
 
