@@ -445,7 +445,7 @@ def final_results(request, profile_id):
 
     # Fetch all cards sorted by ELO
     cards = list(Card.objects.filter(profile=profile))
-    all_duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge'))
+    all_duels = list(Duel.objects.filter(winner__profile=profile).select_related('judge').order_by('created_at'))
     
     # Apply filters
     filtered_duels = []
