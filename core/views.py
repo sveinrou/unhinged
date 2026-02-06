@@ -331,11 +331,48 @@ def card_detail(request, profile_id, card_id):
     else:
          card_history.insert(0, {'x': 0, 'y': 1200.0})
 
+    # Aggregate voting history by participant
+    vote_stats = {}
+    
+    # Fetch all participants for this profile to initialize
+    participants = Participant.objects.filter(profile=profile)
+    for p in participants:
+        vote_stats[p.name] = {'won': 0, 'lost': 0}
+        
+    # Analyze duels involving this card
+    relevant_duels = Duel.objects.filter(Q(winner=card) | Q(loser=card)).select_related('judge', 'winner', 'loser')
+    
+    for duel in relevant_duels:
+        if duel.judge: # Only count if there was a judge (participant)
+            judge_name = duel.judge.name
+            if judge_name not in vote_stats:
+                vote_stats[judge_name] = {'won': 0, 'lost': 0}
+            
+            if duel.winner == card:
+                vote_stats[judge_name]['won'] += 1
+            else:
+                vote_stats[judge_name]['lost'] += 1
+    
+    # Convert to list for template
+    voter_history = []
+    for name, stats in vote_stats.items():
+        total = stats['won'] + stats['lost']
+        if total > 0: # Only include if they have voted on this card
+            voter_history.append({
+                'name': name,
+                'won': stats['won'],
+                'lost': stats['lost'],
+                'total': total
+            })
+    
+    voter_history.sort(key=lambda x: x['total'], reverse=True)
+
     return render(request, 'card_detail.html', {
         'profile': profile,
         'card': card,
         'elo_rating': current_rating,
-        'elo_history': card_history
+        'elo_history': card_history,
+        'voter_history': voter_history
     })
 
 def delete_card(request, profile_id, card_id):
